@@ -58,6 +58,12 @@ async function run(){
         res.send(review);
       });
 
+      app.post("/uploadReview", async (req, res) => {
+        const data = req.body;
+        const result = await reviewCollection.insertOne(data);
+        res.send(result);
+      });
+
 
     }
     finally{
