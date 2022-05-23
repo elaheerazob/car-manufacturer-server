@@ -28,6 +28,13 @@ async function run(){
             res.send(services);
         })
 
+        // uploade product
+        app.post("/uploadProduct", async (req, res) => {
+            const data = req.body;
+            const result = await productsCollection.insertOne(data);
+            res.send(result);
+          });
+
         app.get("/product/:id", async (req, res) => {
             const id = req.params.id;
             console.log(id);
@@ -35,6 +42,14 @@ async function run(){
             const result = await productsCollection.findOne(query);
             res.send(result);
           });
+
+           //delete
+    app.delete("/product/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const products = await productCollection.deleteOne(query);
+        res.send(products);
+      });
 
 
     }
