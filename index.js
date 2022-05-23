@@ -20,6 +20,7 @@ async function run(){
     try{
         await client.connect();
         const productsCollection = client.db('Car-manufacturer').collection('products');
+        const reviewCollection = client.db('Car-manufacturer').collection('reviews');
 
         app.get('/products', async(req, res) =>{
             const query = {};
@@ -47,8 +48,14 @@ async function run(){
     app.delete("/product/:id", async (req, res) => {
         const id = req.params.id;
         const query = { _id: ObjectId(id) };
-        const products = await productCollection.deleteOne(query);
+        const products = await productsCollection.deleteOne(query);
         res.send(products);
+      });
+
+       //review
+    app.get("/review", async (req, res) => {
+        const review = await reviewCollection.find({}).toArray();
+        res.send(review);
       });
 
 
