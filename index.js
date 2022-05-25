@@ -21,6 +21,39 @@ async function run(){
         await client.connect();
         const productsCollection = client.db('Car-manufacturer').collection('products');
         const reviewCollection = client.db('Car-manufacturer').collection('reviews');
+        const userCollection = client.db('Car-manufacturer').collection('users ');
+        const orderCollection = client.db('Car-manufacturer').collection('order ');
+
+
+
+        //order
+        app.post("/uploadOrder", async (req, res) => {
+          const data = req.body;
+          const result = await orderCollection.insertOne(data);
+          res.send(result);
+        });
+
+         //user email order
+      app.get("/order", async (req, res) => {
+        const email = req.query.email;
+        const query = { email: email };
+        const order = await orderCollection.find(query).toArray();
+        return res.send(order);
+      });
+
+        //all order
+    app.get("/orders", async (req, res) => {
+      const order = await orderCollection.find({}).toArray();
+      res.send(order);
+    });
+
+      app.delete("/order/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const order = await orderCollection.deleteOne(query);
+        res.send(order);
+      });
+  
 
         app.get('/products', async(req, res) =>{
             const query = {};
@@ -63,6 +96,46 @@ async function run(){
         const result = await reviewCollection.insertOne(data);
         res.send(result);
       });
+
+      //user admin
+    app.get("/user", async (req, res) => {
+      const users = await userCollection.find().toArray();
+      res.send(users);
+    });
+    app.put("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+
+      app.get("/admin/:email", async (req, res) => {
+        const email = req.params.email;
+        const user = await userCollection.findOne({ email: email });
+        const isAdmin = user.role === "admin";
+        res.send({ admin: isAdmin });
+      });
+
+      app.put("/user/admin/:email", async (req, res) => {
+        const email = req.params.email;
+        const filter = { email: email };
+        const updateDoc = {
+          $set: { role: "admin" },
+        };
+        const result = await userCollection.updateOne(filter, updateDoc);
+        res.send(result);
+      });
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+    app.delete("/user/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const user = await userCollection.deleteOne(query);
+      res.send(user);
+    });
 
 
     }
