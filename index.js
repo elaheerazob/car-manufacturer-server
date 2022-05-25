@@ -23,8 +23,19 @@ async function run(){
         const reviewCollection = client.db('Car-manufacturer').collection('reviews');
         const userCollection = client.db('Car-manufacturer').collection('users ');
         const orderCollection = client.db('Car-manufacturer').collection('order ');
+        const profileCollection = client.db('Car-manufacturer').collection('profile');
 
 
+         //profile
+    app.get("/profile", async (req, res) => {
+      const profile = await profileCollection.find({}).toArray();
+      res.send(profile);
+    });
+    app.post("/uploadProfile", async (req, res) => {
+      const data = req.body;
+      const result = await profileCollection.insertOne(data);
+      res.send(result);
+    });
 
         //order
         app.post("/uploadOrder", async (req, res) => {
@@ -34,11 +45,12 @@ async function run(){
         });
 
          //user email order
-      app.get("/order", async (req, res) => {
-        const email = req.query.email;
+      app.get("/order/:email", async (req, res) => {
+        const email = req.params.email;
         const query = { email: email };
+        console.log(query);
         const order = await orderCollection.find(query).toArray();
-        return res.send(order);
+        res.send(order);
       });
 
         //all order
