@@ -114,6 +114,18 @@ async function run(){
       const users = await userCollection.find().toArray();
       res.send(users);
     });
+    //profile post
+
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = {email: email}
+      const users = await userCollection.findOne(query);
+      res.send(users);
+    });
+
+
+
+    //profile end
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
