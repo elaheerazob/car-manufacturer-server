@@ -1,32 +1,37 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const port =process.env.PORT || 5000;
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const port = process.env.PORT || 5000;
 const app = express();
 
 //middle Ware
 app.use(cors());
 app.use(express.json());
 
-
-
-
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.1h4ey.mongodb.net/?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverApi: ServerApiVersion.v1,
+});
 
-async function run(){
-    try{
-        await client.connect();
-        const productsCollection = client.db('Car-manufacturer').collection('products');
-        const reviewCollection = client.db('Car-manufacturer').collection('reviews');
-        const userCollection = client.db('Car-manufacturer').collection('users ');
-        const orderCollection = client.db('Car-manufacturer').collection('order ');
-        const profileCollection = client.db('Car-manufacturer').collection('profile');
+async function run() {
+  try {
+    await client.connect();
+    const productsCollection = client
+      .db("Car-manufacturer")
+      .collection("products");
+    const reviewCollection = client
+      .db("Car-manufacturer")
+      .collection("reviews");
+    const userCollection = client.db("Car-manufacturer").collection("users ");
+    const orderCollection = client.db("Car-manufacturer").collection("order ");
+    const profileCollection = client
+      .db("Car-manufacturer")
+      .collection("profile");
 
-
-         //profile
+    //profile
     app.get("/profile", async (req, res) => {
       const profile = await profileCollection.find({}).toArray();
       res.send(profile);
@@ -37,103 +42,95 @@ async function run(){
       res.send(result);
     });
 
-        //order
-        app.post("/uploadOrder", async (req, res) => {
-          const data = req.body;
-          const result = await orderCollection.insertOne(data);
-          res.send(result);
-        });
+    //order
+    app.post("/uploadOrder", async (req, res) => {
+      const data = req.body;
+      const result = await orderCollection.insertOne(data);
+      res.send(result);
+    });
 
-         //user email order
-      app.get("/order/:email", async (req, res) => {
-        const email = req.params.email;
-        const query = { email: email };
-        console.log(query);
-        const order = await orderCollection.find(query).toArray();
-        res.send(order);
-      });
+    //user email order
+    app.get("/order/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      console.log(query);
+      const order = await orderCollection.find(query).toArray();
+      res.send(order);
+    });
 
-        //all order
+    //all order
     app.get("/orders", async (req, res) => {
       const order = await orderCollection.find({}).toArray();
       res.send(order);
     });
 
-      app.delete("/order/:id", async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: ObjectId(id) };
-        const order = await orderCollection.deleteOne(query);
-        res.send(order);
-      });
-  
+    app.delete("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const order = await orderCollection.deleteOne(query);
+      res.send(order);
+    });
 
-        app.get('/products', async(req, res) =>{
-            const query = {};
-            const cursor = productsCollection.find(query);
-            const services = await cursor.toArray();
-            res.send(services);
-        })
+    app.get("/products", async (req, res) => {
+      const query = {};
+      const cursor = productsCollection.find(query);
+      const services = await cursor.toArray();
+      res.send(services);
+    });
 
-        // uploade product
-        app.post("/uploadProduct", async (req, res) => {
-            const data = req.body;
-            const result = await productsCollection.insertOne(data);
-            res.send(result);
-          });
+    // uploade product
+    app.post("/uploadProduct", async (req, res) => {
+      const data = req.body;
+      const result = await productsCollection.insertOne(data);
+      res.send(result);
+    });
 
-        app.get("/product/:id", async (req, res) => {
-            const id = req.params.id;
-            console.log(id);
-            const query = { _id: ObjectId(id) };
-            const result = await productsCollection.findOne(query);
-            res.send(result);
-          });
+    app.get("/product/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: ObjectId(id) };
+      const result = await productsCollection.findOne(query);
+      res.send(result);
+    });
 
-           //delete
+    //delete
     app.delete("/product/:id", async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: ObjectId(id) };
-        const products = await productsCollection.deleteOne(query);
-        res.send(products);
-      });
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const products = await productsCollection.deleteOne(query);
+      res.send(products);
+    });
 
-       //review
+    //review
     app.get("/review", async (req, res) => {
-        const review = await reviewCollection.find({}).toArray();
-        res.send(review);
-      });
+      const review = await reviewCollection.find({}).toArray();
+      res.send(review);
+    });
 
-      app.post("/uploadReview", async (req, res) => {
-        const data = req.body;
-        const result = await reviewCollection.insertOne(data);
-        res.send(result);
-      });
+    app.post("/uploadReview", async (req, res) => {
+      const data = req.body;
+      const result = await reviewCollection.insertOne(data);
+      res.send(result);
+    });
 
-      //user admin
+    //user admin
     app.get("/user", async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
+
     //profile post
-    app.put('/user/:id', async(req, res) => {
-      const id = req.params.id;
+    app.put("/userprofile", async (req, res) => {
       const data = req.body;
-      const filter = {_id: ObjectId(id)};
-      const options = { upsert: true };
-      const updateDoc = {
-        $set: data
-      }; 
-      const result = await userCollection.updateOne(filter, updateDoc, options);
-      res.send(result)
-    })
+      const result = await userCollection.insertOne(data);
+      res.send(result);
+    });
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
-      const query = {email: email}
+      const query = { email: email };
       const users = await userCollection.findOne(query);
       res.send(users);
     });
-
-
 
     //profile end
     app.put("/user/:email", async (req, res) => {
@@ -170,23 +167,16 @@ async function run(){
       const user = await userCollection.deleteOne(query);
       res.send(user);
     });
-
-
-    }
-    finally{
-
-    }
+  } finally {
+  }
 }
 
 run().catch(console.dir);
 
+app.get("/", (req, res) => {
+  res.send("Car Connect");
+});
 
-
-app.get('/',(req,res) =>{
-    res.send('Car Connect')
-})
-
-
-app.listen(port,() =>{
-    console.log('Now' ,port);
-})
+app.listen(port, () => {
+  console.log("Now", port);
+});
