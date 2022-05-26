@@ -115,7 +115,17 @@ async function run(){
       res.send(users);
     });
     //profile post
-
+    app.put('/user/:id', async(req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const filter = {_id: ObjectId(id)};
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: data
+      }; 
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result)
+    })
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
       const query = {email: email}
