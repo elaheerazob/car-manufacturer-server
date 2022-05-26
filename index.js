@@ -6,11 +6,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 
 //middle Ware
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.1h4ey.mongodb.net/?retryWrites=true&w=majority`;
@@ -145,7 +141,7 @@ async function run() {
       const updateDoc = {
         $set: user,
       };
-      // admin email get
+
       app.get("/admin/:email", async (req, res) => {
         const email = req.params.email;
         const user = await userCollection.findOne({ email: email });
